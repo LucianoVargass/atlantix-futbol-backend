@@ -1,0 +1,24 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Player;
+
+class PlayerDocument extends Model
+{
+    protected $fillable = [
+        'player_id',
+        'document_type',
+        'document_number',
+        'front_url',
+        'back_url',
+        'status',
+    ];
+
+    public function player(): BelongsTo
+    {
+        return $this->belongsTo(Player::class);
+    }
+}

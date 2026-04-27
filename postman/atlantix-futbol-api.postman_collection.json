@@ -1,0 +1,274 @@
+{
+  "info": {
+    "name": "Atlantix Futbol API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000/api"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/health"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/users"
+          }
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Admin\",\n  \"email\": \"admin@example.com\",\n  \"password\": \"secret123\",\n  \"role\": \"super_admin\"\n}"
+            },
+            "url": "{{baseUrl}}/users"
+          }
+        },
+        {
+          "name": "Get User",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/users/1"
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Admin Updated\"\n}"
+            },
+            "url": "{{baseUrl}}/users/1"
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/users/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tournaments",
+      "item": [
+        {
+          "name": "List Tournaments",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/tournaments"
+          }
+        },
+        {
+          "name": "Create Tournament",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Copa Atlantix\",\n  \"status\": \"registration_open\",\n  \"format\": \"league\",\n  \"sport_type\": \"futbol5\",\n  \"players_per_team\": 5,\n  \"max_teams\": 12,\n  \"registration_fee\": 500,\n  \"matchday_fee\": 120,\n  \"currency\": \"ARS\"\n}"
+            },
+            "url": "{{baseUrl}}/tournaments"
+          }
+        },
+        {
+          "name": "Get Tournament",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/tournaments/1"
+          }
+        },
+        {
+          "name": "Update Tournament",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"in_progress\"\n}"
+            },
+            "url": "{{baseUrl}}/tournaments/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Teams",
+      "item": [
+        {
+          "name": "List Teams",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/teams"
+          }
+        },
+        {
+          "name": "Create Team",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Atlético FC\",\n  \"city\": \"Buenos Aires\"\n}"
+            },
+            "url": "{{baseUrl}}/teams"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Players",
+      "item": [
+        {
+          "name": "List Players",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/players"
+          }
+        },
+        {
+          "name": "Create Player",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Juan\",\n  \"surname\": \"Perez\",\n  \"position\": \"Delantero\"\n}"
+            },
+            "url": "{{baseUrl}}/players"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Registrations",
+      "item": [
+        {
+          "name": "Create Team Tournament Registration",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"team_id\": 1,\n  \"tournament_id\": 1,\n  \"subscription_status\": \"registered\"\n}"
+            },
+            "url": "{{baseUrl}}/team-tournament-registrations"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Matchdays",
+      "item": [
+        {
+          "name": "Create Matchday",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tournament_id\": 1,\n  \"number\": 1\n}"
+            },
+            "url": "{{baseUrl}}/matchdays"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Matches",
+      "item": [
+        {
+          "name": "Create Match",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tournament_id\": 1,\n  \"matchday_id\": 1,\n  \"home_team_id\": 1,\n  \"away_team_id\": 2,\n  \"status\": \"upcoming\"\n}"
+            },
+            "url": "{{baseUrl}}/football-matches"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "Create Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tournament_id\": 1,\n  \"team_id\": 1,\n  \"type\": \"registration_fee\",\n  \"amount\": 500,\n  \"currency\": \"ARS\"\n}"
+            },
+            "url": "{{baseUrl}}/payments"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Mercado Pago",
+      "item": [
+        {
+          "name": "Create Preference",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Inscripción Copa Atlantix\",\n  \"amount\": 500,\n  \"currency\": \"ARS\"\n}"
+            },
+            "url": "{{baseUrl}}/payments/mercadopago/preference"
+          }
+        }
+      ]
+    }
+  ]
+}

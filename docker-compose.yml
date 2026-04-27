@@ -1,0 +1,34 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: futbol-mysql
+    restart: unless-stopped
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_DATABASE: futbol_db
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: futbol_user
+      MYSQL_PASSWORD: futbol_pass
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d
+    command: --default-authentication-plugin=mysql_native_password
+
+  laravel:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: futbol-laravel
+    restart: unless-stopped
+    depends_on:
+      - mysql
+    ports:
+      - "8200:8000"
+    volumes:
+      - .:/var/www
+    working_dir: /var/www
+    command: php artisan serve --host=0.0.0.0 --port=8000
+
+volumes:
+  mysql_data:
