@@ -1,14 +1,3 @@
-// Ruta de debug para uploads
-use Illuminate\Http\Request as DebugRequest;
-Route::post('debug-upload', function (DebugRequest $request) {
-	\Log::info('Debug upload', [
-		'all' => $request->all(),
-		'files' => $request->allFiles(),
-		'hasFile' => $request->hasFile('photo'),
-		'file_class' => is_object($request->file('photo')) ? get_class($request->file('photo')) : null,
-	]);
-	return response()->json(['ok' => true]);
-});
 <?php
 
 use Illuminate\Support\Facades\Route;
