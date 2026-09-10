@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\Player;
+use App\Models\PlayerStat;
+use App\Models\Sanction;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
@@ -11,6 +13,57 @@ class PlayerController extends BaseApiController
     use AuthorizesRequests;
 
     protected string $modelClass = Player::class;
+
+    /**
+     * Estadísticas de un jugador: totales globales + desglose por torneo.
+     * Público (vista de hincha / perfil del jugador).
+     */
+    public function stats(Request $request, Player $player)
+    {
+        $stats = PlayerStat::where('player_id', $player->id)
+            ->with('tournament:id,name,status,format')
+            ->get();
+
+        $byTournament = $stats->map(fn ($s) => [
+            'tournament_id' => $s->tournament_id,
+            'tournament' => $s->tournament,
+            'goals' => (int) $s->goals,
+            'assists' => (int) $s->assists,
+            'yellow_cards' => (int) $s->yellow_cards,
+            'red_cards' => (int) $s->red_cards,
+            'appearances' => (int) $s->appearances,
+        ])->values();
+
+        $totals = [
+            'goals' => (int) $stats->sum('goals'),
+            'assists' => (int) $stats->sum('assists'),
+            'yellow_cards' => (int) $stats->sum('yellow_cards'),
+            'red_cards' => (int) $stats->sum('red_cards'),
+            'appearances' => (int) $stats->sum('appearances'),
+            'tournaments' => $stats->pluck('tournament_id')->unique()->count(),
+        ];
+
+        // fallback a los contadores planos del jugador si todavía no hay player_stats
+        if ($byTournament->isEmpty()) {
+            $totals['goals'] = (int) $player->goals;
+            $totals['yellow_cards'] = (int) $player->yellow_cards;
+            $totals['red_cards'] = (int) $player->red_cards;
+            $totals['appearances'] = (int) $player->appearances;
+        }
+
+        $sanctions = Sanction::where('player_id', $player->id)
+            ->where('status', 'active')
+            ->get(['id', 'type', 'reason', 'matches', 'status', 'tournament_id']);
+
+        return response()->json([
+            'data' => [
+                'player' => $player->load('team:id,name,logo_url'),
+                'totals' => $totals,
+                'by_tournament' => $byTournament,
+                'sanctions' => $sanctions,
+            ],
+        ]);
+    }
 
     public function store(Request $request)
     {

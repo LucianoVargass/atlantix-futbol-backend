@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Player;
+use App\Models\Referee;
+use App\Models\FootballMatch;
 use Illuminate\Http\Request;
 
 class MeController extends Controller
@@ -12,6 +15,45 @@ class MeController extends Controller
         return response()->json([
             'data' => $request->user(),
         ]);
+    }
+
+    /** Ficha del jugador logueado (si su usuario está vinculado a un Player). */
+    public function player(Request $request)
+    {
+        $user = $request->user();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $player = Player::where('user_id', $user->id)
+            ->with('team:id,name,logo_url')
+            ->first();
+
+        return response()->json(['data' => $player]);
+    }
+
+    /** Partidos asignados al árbitro logueado. */
+    public function matches(Request $request)
+    {
+        $user = $request->user();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $refereeIds = Referee::where('user_id', $user->id)
+            ->orWhere(function ($q) use ($user) {
+                if ($user->email) {
+                    $q->whereRaw('LOWER(email) = ?', [strtolower($user->email)]);
+                }
+            })
+            ->pluck('id');
+
+        $matches = FootballMatch::whereIn('referee_id', $refereeIds)
+            ->with(['homeTeam:id,name,logo_url', 'awayTeam:id,name,logo_url', 'matchday:id,name,number', 'tournament:id,name'])
+            ->orderByRaw('COALESCE(scheduled_at, created_at) desc')
+            ->get();
+
+        return response()->json(['data' => $matches]);
     }
 
     public function tournaments(Request $request)

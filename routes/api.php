@@ -49,11 +49,15 @@ Route::post('auth/login', [AuthController::class, 'login']);
 if ($authMiddleware) {
 	Route::middleware($authMiddleware)->get('me', [MeController::class, 'me']);
 	Route::middleware($authMiddleware)->get('me/tournaments', [MeController::class, 'tournaments']);
+	Route::middleware($authMiddleware)->get('me/player', [MeController::class, 'player']);
+	Route::middleware($authMiddleware)->get('me/matches', [MeController::class, 'matches']);
 	Route::middleware($authMiddleware)->get('me/mercadopago', [MeController::class, 'mercadoPago']);
 	Route::middleware($authMiddleware)->put('me/mercadopago', [MeController::class, 'updateMercadoPago']);
 } else {
 	Route::get('me', [MeController::class, 'me']);
 	Route::get('me/tournaments', [MeController::class, 'tournaments']);
+	Route::get('me/player', [MeController::class, 'player']);
+	Route::get('me/matches', [MeController::class, 'matches']);
 }
 
 ($authMiddleware ? Route::middleware($authMiddleware) : Route::middleware([]))->group(function () {
@@ -118,6 +122,19 @@ if ($authMiddleware) {
 
 Route::get('football-matches', [FootballMatchController::class, 'index']);
 Route::get('football-matches/{football_match}', [FootballMatchController::class, 'show']);
+
+// --- Lecturas públicas para la app (hincha / perfil de jugador) ---
+Route::get('players/{player}/stats', [PlayerController::class, 'stats']);
+Route::get('matchdays', [MatchdayController::class, 'index']);
+Route::get('matchdays/{matchday}', [MatchdayController::class, 'show']);
+Route::get('match-lineups', [MatchLineupController::class, 'index']);
+Route::get('match-lineups/{match_lineup}', [MatchLineupController::class, 'show']);
+Route::get('match-lineup-players', [MatchLineupPlayerController::class, 'index']);
+Route::get('match-events', [MatchEventController::class, 'index']);
+Route::get('team-stats', [TeamStatController::class, 'index']);
+Route::get('player-stats', [PlayerStatController::class, 'index']);
+Route::get('tournament-news', [TournamentNewsController::class, 'index']);
+
 if ($authMiddleware) {
 	Route::post('football-matches/{football_match}/finalize', [FootballMatchController::class, 'finalize'])
 		->middleware($authMiddleware);
