@@ -27,6 +27,17 @@ class TournamentReviewController extends Controller
             'documentation_status' => 'approved',
         ]);
 
+        // Sella la verificación del DNI del jugador: reutilizable en próximos
+        // torneos mientras no venza.
+        PlayerDocument::where('player_id', $tournamentPlayer->player_id)
+            ->whereNull('verified_at')
+            ->update([
+                'status' => 'approved',
+                'verified_at' => now(),
+                'expires_at' => now()->addMonths(12),
+                'verified_by' => $request->user()?->id,
+            ]);
+
         return response()->json(['data' => $tournamentPlayer]);
     }
 

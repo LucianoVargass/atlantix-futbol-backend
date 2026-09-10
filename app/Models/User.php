@@ -90,4 +90,24 @@ class User extends Authenticatable
     {
         return $this->hasMany(Payment::class, 'payer_user_id');
     }
+
+    public function organizationMemberships(): HasMany
+    {
+        return $this->hasMany(OrganizationMember::class);
+    }
+
+    public function organizations()
+    {
+        return $this->belongsToMany(Organization::class, 'organization_members')->withPivot('role');
+    }
+
+    public function ownedClubs(): HasMany
+    {
+        return $this->hasMany(Team::class, 'owner_user_id');
+    }
+
+    public function playerProfile(): HasMany
+    {
+        return $this->hasMany(Player::class, 'user_id');
+    }
 }

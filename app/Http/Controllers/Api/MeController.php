@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Player;
 use App\Models\Referee;
 use App\Models\FootballMatch;
+use App\Models\Team;
 use Illuminate\Http\Request;
 
 class MeController extends Controller
@@ -15,6 +16,43 @@ class MeController extends Controller
         return response()->json([
             'data' => $request->user(),
         ]);
+    }
+
+    /** Organizaciones a las que pertenece el usuario, con su rol. */
+    public function organizations(Request $request)
+    {
+        $user = $request->user();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $orgs = $user->organizations()->with('tournaments:id,organization_id,name,status')->get()
+            ->map(fn ($org) => [
+                'id' => $org->id,
+                'name' => $org->name,
+                'slug' => $org->slug,
+                'plan' => $org->plan,
+                'role' => $org->pivot->role,
+                'tournaments' => $org->tournaments,
+            ]);
+
+        return response()->json(['data' => $orgs]);
+    }
+
+    /** El club del que el usuario es dueño / delegado. */
+    public function club(Request $request)
+    {
+        $user = $request->user();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $team = Team::where('owner_user_id', $user->id)
+            ->orWhereHas('admins', fn ($q) => $q->where('users.id', $user->id))
+            ->with(['players', 'registrations.tournament:id,name,status', 'registrations.division:id,name,gender'])
+            ->first();
+
+        return response()->json(['data' => $team]);
     }
 
     /** Ficha del jugador logueado (si su usuario está vinculado a un Player). */

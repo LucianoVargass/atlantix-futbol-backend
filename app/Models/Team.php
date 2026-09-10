@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Models\User;
 use App\Models\Player;
@@ -13,6 +14,7 @@ use App\Models\TeamStat;
 class Team extends Model
 {
     protected $fillable = [
+        'owner_user_id',
         'name',
         'short_name',
         'city',
@@ -26,6 +28,11 @@ class Team extends Model
     public function players(): HasMany
     {
         return $this->hasMany(Player::class);
+    }
+
+    public function owner(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'owner_user_id');
     }
 
     public function registrations(): HasMany

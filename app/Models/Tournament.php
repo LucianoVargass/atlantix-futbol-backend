@@ -15,6 +15,7 @@ use App\Models\TournamentNews;
 class Tournament extends Model
 {
     protected $fillable = [
+        'organization_id',
         'admin_user_id',
         'name',
         'description',
@@ -90,5 +91,30 @@ class Tournament extends Model
     public function teamStats(): HasMany
     {
         return $this->hasMany(TeamStat::class);
+    }
+
+    public function organization(): BelongsTo
+    {
+        return $this->belongsTo(Organization::class);
+    }
+
+    public function divisions(): HasMany
+    {
+        return $this->hasMany(Division::class)->orderBy('order');
+    }
+
+    /** ¿El usuario puede administrar este torneo? (miembro de la organización dueña) */
+    public function managedBy(?int $userId): bool
+    {
+        if (!$userId) {
+            return false;
+        }
+        if ($this->admin_user_id && (int) $this->admin_user_id === $userId) {
+            return true;
+        }
+        if ($this->organization_id && $this->organization && $this->organization->hasMember($userId)) {
+            return true;
+        }
+        return $this->admins()->where('users.id', $userId)->exists();
     }
 }

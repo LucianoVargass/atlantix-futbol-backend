@@ -25,9 +25,9 @@ class TournamentPolicy
     public function update(User $user, Tournament $tournament): bool
     {
         if ($user->role === 'super_admin') return true;
-        if ($user->role !== 'tournament_admin') return false;
-        return $tournament->admin_user_id === $user->id
-            || $tournament->admins()->where('users.id', $user->id)->exists();
+        // miembro de la organización dueña del torneo (owner o admin),
+        // o co-admin del torneo por el pivot legacy.
+        return $tournament->managedBy($user->id);
     }
 
     public function delete(User $user, Tournament $tournament): bool

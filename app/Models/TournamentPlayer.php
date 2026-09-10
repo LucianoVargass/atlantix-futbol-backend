@@ -12,6 +12,7 @@ class TournamentPlayer extends Model
 {
     protected $fillable = [
         'tournament_id',
+        'division_id',
         'team_id',
         'player_id',
         'status',
@@ -31,6 +32,11 @@ class TournamentPlayer extends Model
     public function tournament(): BelongsTo
     {
         return $this->belongsTo(Tournament::class);
+    }
+
+    public function division(): BelongsTo
+    {
+        return $this->belongsTo(Division::class);
     }
 
     public function team(): BelongsTo

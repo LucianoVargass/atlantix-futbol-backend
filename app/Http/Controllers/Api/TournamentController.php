@@ -58,15 +58,31 @@ class TournamentController extends BaseApiController
     {
         $this->authorize('update', $tournament);
 
-        if (FootballMatch::where('tournament_id', $tournament->id)->exists()) {
-            return response()->json(['message' => 'El torneo ya tiene partidos creados.'], 409);
+        // División objetivo: la pedida, o la única del torneo.
+        $divisionId = $request->integer('division_id') ?: null;
+        if (!$divisionId) {
+            $divisions = $tournament->divisions()->pluck('id');
+            if ($divisions->count() === 1) {
+                $divisionId = (int) $divisions->first();
+            } elseif ($divisions->count() > 1) {
+                return response()->json(['message' => 'El torneo tiene varias divisiones — indicá division_id.'], 422);
+            }
         }
 
-        $registrations = TeamTournamentRegistration::where('tournament_id', $tournament->id)
-            ->where('subscription_status', 'confirmed')
-            ->pluck('team_id')
-            ->map(fn ($id) => (int) $id)
-            ->values();
+        $matchQuery = FootballMatch::where('tournament_id', $tournament->id);
+        if ($divisionId) {
+            $matchQuery->where('division_id', $divisionId);
+        }
+        if ($matchQuery->exists()) {
+            return response()->json(['message' => 'Esta división ya tiene partidos creados.'], 409);
+        }
+
+        $regQuery = TeamTournamentRegistration::where('tournament_id', $tournament->id)
+            ->where('subscription_status', 'confirmed');
+        if ($divisionId) {
+            $regQuery->where('division_id', $divisionId);
+        }
+        $registrations = $regQuery->pluck('team_id')->map(fn ($id) => (int) $id)->values();
 
         if ($registrations->isEmpty()) {
             return response()->json(['message' => 'No hay equipos confirmados para generar fixture.'], 422);
@@ -91,8 +107,12 @@ class TournamentController extends BaseApiController
         $totalTeams = count($teamIds);
         $roundsPerLeg = $totalTeams - 1;
 
-        DB::transaction(function () use ($tournament, $teamIds, $totalTeams, $roundsPerLeg, $leagueRounds) {
-            Matchday::where('tournament_id', $tournament->id)->delete();
+        DB::transaction(function () use ($tournament, $teamIds, $totalTeams, $roundsPerLeg, $leagueRounds, $divisionId) {
+            $del = Matchday::where('tournament_id', $tournament->id);
+            if ($divisionId) {
+                $del->where('division_id', $divisionId);
+            }
+            $del->delete();
 
             $teams = $teamIds;
             $matchdayNumber = 1;
@@ -101,6 +121,7 @@ class TournamentController extends BaseApiController
                 for ($round = 0; $round < $roundsPerLeg; $round++) {
                     $matchday = Matchday::create([
                         'tournament_id' => $tournament->id,
+                        'division_id' => $divisionId,
                         'number' => $matchdayNumber,
                         'name' => 'Fecha ' . $matchdayNumber,
                         'status' => 'scheduled',
@@ -120,6 +141,7 @@ class TournamentController extends BaseApiController
 
                         FootballMatch::create([
                             'tournament_id' => $tournament->id,
+                            'division_id' => $divisionId,
                             'matchday_id' => $matchday->id,
                             'home_team_id' => $homeId,
                             'away_team_id' => $awayId,

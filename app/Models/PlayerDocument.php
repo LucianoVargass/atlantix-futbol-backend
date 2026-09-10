@@ -15,10 +15,26 @@ class PlayerDocument extends Model
         'front_url',
         'back_url',
         'status',
+        'verified_at',
+        'expires_at',
+        'verified_by',
+    ];
+
+    protected $casts = [
+        'verified_at' => 'datetime',
+        'expires_at' => 'datetime',
     ];
 
     public function player(): BelongsTo
     {
         return $this->belongsTo(Player::class);
+    }
+
+    /** Documento verificado y todavía vigente. */
+    public function isValid(): bool
+    {
+        return $this->status === 'approved'
+            && $this->verified_at !== null
+            && ($this->expires_at === null || $this->expires_at->isFuture());
     }
 }

@@ -12,6 +12,7 @@ class Matchday extends Model
 {
     protected $fillable = [
         'tournament_id',
+        'division_id',
         'number',
         'name',
         'start_date',
@@ -27,6 +28,11 @@ class Matchday extends Model
     public function tournament(): BelongsTo
     {
         return $this->belongsTo(Tournament::class);
+    }
+
+    public function division(): BelongsTo
+    {
+        return $this->belongsTo(Division::class);
     }
 
     public function matches(): HasMany

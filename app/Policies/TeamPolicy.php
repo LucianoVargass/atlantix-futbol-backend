@@ -27,7 +27,8 @@ class TeamPolicy
         if ($user->role === 'super_admin') return true;
         if ($user->role === 'tournament_admin') return true;
         if ($user->role === 'team_admin') {
-            return $team->admins()->where('users.id', $user->id)->exists();
+            return (int) $team->owner_user_id === (int) $user->id
+                || $team->admins()->where('users.id', $user->id)->exists();
         }
         return false;
     }

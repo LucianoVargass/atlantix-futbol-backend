@@ -12,6 +12,7 @@ class TeamTournamentRegistration extends Model
     protected $fillable = [
         'team_id',
         'tournament_id',
+        'division_id',
         'subscription_status',
         'subscription_date',
         'payment_status',
@@ -40,5 +41,10 @@ class TeamTournamentRegistration extends Model
     public function tournament(): BelongsTo
     {
         return $this->belongsTo(Tournament::class);
+    }
+
+    public function division(): BelongsTo
+    {
+        return $this->belongsTo(Division::class);
     }
 }

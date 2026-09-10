@@ -51,6 +51,8 @@ if ($authMiddleware) {
 	Route::middleware($authMiddleware)->get('me/tournaments', [MeController::class, 'tournaments']);
 	Route::middleware($authMiddleware)->get('me/player', [MeController::class, 'player']);
 	Route::middleware($authMiddleware)->get('me/matches', [MeController::class, 'matches']);
+	Route::middleware($authMiddleware)->get('me/organizations', [MeController::class, 'organizations']);
+	Route::middleware($authMiddleware)->get('me/club', [MeController::class, 'club']);
 	Route::middleware($authMiddleware)->get('me/mercadopago', [MeController::class, 'mercadoPago']);
 	Route::middleware($authMiddleware)->put('me/mercadopago', [MeController::class, 'updateMercadoPago']);
 } else {
@@ -58,6 +60,8 @@ if ($authMiddleware) {
 	Route::get('me/tournaments', [MeController::class, 'tournaments']);
 	Route::get('me/player', [MeController::class, 'player']);
 	Route::get('me/matches', [MeController::class, 'matches']);
+	Route::get('me/organizations', [MeController::class, 'organizations']);
+	Route::get('me/club', [MeController::class, 'club']);
 }
 
 ($authMiddleware ? Route::middleware($authMiddleware) : Route::middleware([]))->group(function () {
