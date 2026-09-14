@@ -7,6 +7,7 @@ use Illuminate\Database\Seeder;
 use Database\Seeders\SuperAdminSeeder;
 use Database\Seeders\DemoTournamentSeeder;
 use Database\Seeders\DemoResultsSeeder;
+use Database\Seeders\DemoDivisionsSeeder;
 use App\Services\MultitenantBackfill;
 
 class DatabaseSeeder extends Seeder
@@ -21,9 +22,11 @@ class DatabaseSeeder extends Seeder
         $this->call(SuperAdminSeeder::class);
         $this->call(DemoTournamentSeeder::class);
         $this->call(DemoResultsSeeder::class);
+        $this->call(DemoDivisionsSeeder::class);
 
         // Deja el dataset demo en el modelo multi-tenant (organizaciones,
-        // divisiones "General", dueños de club, género normalizado).
+        // división "General" para lo que no tenga una propia, dueños de
+        // club, género normalizado).
         MultitenantBackfill::run();
     }
 }

@@ -176,6 +176,9 @@ class TournamentController extends BaseApiController
                 $inner->where('admin_user_id', $user->id)
                     ->orWhereHas('admins', function (Builder $admins) use ($user) {
                         $admins->where('users.id', $user->id);
+                    })
+                    ->orWhereHas('organization.members', function (Builder $members) use ($user) {
+                        $members->where('user_id', $user->id);
                     });
             });
         }
